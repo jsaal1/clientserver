@@ -30,7 +30,7 @@ Start the client (in a separate terminal):
 
 Example:
 ```bash
-./bin/server_mem 1234
+./bin/server_disk 1234 db
 ./bin/client_main localhost 1234
 ```
 
