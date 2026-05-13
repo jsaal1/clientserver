@@ -14,7 +14,7 @@ Builds `libclientserver.a` from `src/connection.cc` and `src/server.cc`, then co
 
 For cleaning: `make clean`.
 
-## Building with CMake (recommended)
+## Building with CMake
 
 ```
 mkdir build
