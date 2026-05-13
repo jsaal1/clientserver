@@ -1,0 +1,23 @@
+cppproject.pdf
+TestServer1/
+TestServer2/
+db/
+
+# Build output
+build/
+bin/
+
+# Compile artifacts
+*.o
+*.d
+*.a
+
+# CMake generated
+compile_commands.json
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
