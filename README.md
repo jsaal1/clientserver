@@ -41,7 +41,7 @@ Start the server (in-memory or disk-backed):
 
 ```
 build/src/server_mem <port>
-build/src/server_disk <port>
+build/src/server_disk <port> <database directory>
 ```
 
 Start the client:
