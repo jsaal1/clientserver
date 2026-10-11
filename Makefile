@@ -1,30 +1,45 @@
 CXX      = g++
-CC       = $(CXX)
 CPPFLAGS = -I include
 CXXFLAGS = -std=c++17 -O2 -Wall -Wextra -pedantic-errors -g
-LDFLAGS  = -L lib -lclientserver
+LDFLAGS  = -L lib
+LDLIBS   = -lclientserver
 
-SRC = src/messagehandler.cc \
-      src/newsserver.cc
+LIB      = lib/libclientserver.a
+LIB_SRC  = src/connection.cc src/server.cc
+LIB_OBJ  = $(patsubst src/%.cc,build/make/%.o,$(LIB_SRC))
 
-SRC_MEM = $(SRC) src/inmemorydatabase.cc
-SRC_DISK = $(SRC) src/diskdatabase.cc
+SRC      = src/messagehandler.cc src/newsserver.cc
+SRC_MEM  = $(SRC) src/inmemorydatabase.cc src/server_mem_main.cc
+SRC_DISK = $(SRC) src/diskdatabase.cc src/server_disk_main.cc
+SRC_CLI  = src/messagehandler.cc src/client_main.cc
 
-all: bin/server_mem bin/server_disk bin/client_main
+BINS = bin/server_mem bin/server_disk bin/client_main
 
-bin/server_mem: $(SRC_MEM) src/server_mem_main.cc
-	mkdir -p bin
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
+.PHONY: all clean
 
-bin/server_disk: $(SRC_DISK) src/server_disk_main.cc
-	mkdir -p bin
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
+all: $(BINS)
 
-bin/client_main: $(SRC) src/client_main.cc
-	mkdir -p bin
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
+# Communication library (Connection, Server)
+build/make/%.o: src/%.cc
+	@mkdir -p $(@D)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-install: all
+$(LIB): $(LIB_OBJ)
+	@mkdir -p $(@D)
+	ar rcs $@ $^
+
+# Executables
+bin/server_mem: $(SRC_MEM) $(LIB)
+	@mkdir -p $(@D)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(filter %.cc,$^) $(LDFLAGS) $(LDLIBS) -o $@
+
+bin/server_disk: $(SRC_DISK) $(LIB)
+	@mkdir -p $(@D)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(filter %.cc,$^) $(LDFLAGS) $(LDLIBS) -o $@
+
+bin/client_main: $(SRC_CLI) $(LIB)
+	@mkdir -p $(@D)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(filter %.cc,$^) $(LDFLAGS) $(LDLIBS) -o $@
 
 clean:
-	rm -rf bin/
+	rm -rf bin lib build/make
